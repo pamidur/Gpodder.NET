@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GpodderLibDevTool", "GpodderLibDevTool\GpodderLibDevTool.csproj", "{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GpodderLib", "GpodderLib\GpodderLib.csproj", "{D485C949-DF0E-42F7-8148-220DF5021D66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		NET45|Any CPU = NET45|Any CPU
+		WP80|Any CPU = WP80|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.NET45|Any CPU.ActiveCfg = NET45|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.NET45|Any CPU.Build.0 = NET45|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.WP80|Any CPU.ActiveCfg = NET45|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.WP80|Any CPU.Build.0 = NET45|Any CPU
+		{D485C949-DF0E-42F7-8148-220DF5021D66}.NET45|Any CPU.ActiveCfg = NET45|Any CPU
+		{D485C949-DF0E-42F7-8148-220DF5021D66}.NET45|Any CPU.Build.0 = NET45|Any CPU
+		{D485C949-DF0E-42F7-8148-220DF5021D66}.WP80|Any CPU.ActiveCfg = WP80|Any CPU
+		{D485C949-DF0E-42F7-8148-220DF5021D66}.WP80|Any CPU.Build.0 = WP80|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		VisualSVNWorkingCopyRoot = .
+	EndGlobalSection
+EndGlobal
