@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO.IsolatedStorage;
+using System.Threading.Tasks;
 using GpodderLib;
 
 namespace GpodderLibDevTool
@@ -12,8 +13,10 @@ namespace GpodderLibDevTool
 
         static async Task<bool> Login()
         {
-            var client = new GpodderClient("DevTool");
-            return await client.LoginAsync();
+            var storage = IsolatedStorageFile.GetUserStoreForAssembly();
+
+            var client = new PodcastLibrary("DevTool",storage);
+            return await client.Login();
         }
     }
 }
