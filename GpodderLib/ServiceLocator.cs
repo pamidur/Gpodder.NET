@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GpodderLib
 {
-    internal class ServiceLocator
+    class ServiceLocator
     {
         private static readonly Lazy<ServiceLocator> _serviceLocatorInializer = new Lazy<ServiceLocator>(()=>new ServiceLocator()); 
         public static ServiceLocator Instance

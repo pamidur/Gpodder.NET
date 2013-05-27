@@ -6,7 +6,7 @@ using GpodderLib.RemoteServices.Configuration.Dto;
 
 namespace GpodderLib.RemoteServices.Configuration
 {
-    internal class ConfigurationService
+    class ConfigurationService
     {
         private readonly DataContractJsonSerializer _serializer = new DataContractJsonSerializer(typeof(ClientConfig));
         private readonly HttpRequestFactory _requestFactory;
@@ -18,7 +18,7 @@ namespace GpodderLib.RemoteServices.Configuration
             _staticConfiguration = ServiceLocator.Instance.GetService<StaticConfiguration>();
         }
 
-        public async Task<ClientConfig> Init()
+        public async Task<ClientConfig> QueryClientConfig()
         {
             var request = _requestFactory.CreateRequest(new Uri(_staticConfiguration.ClientConfigUri));
 

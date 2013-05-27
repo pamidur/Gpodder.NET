@@ -1,4 +1,6 @@
-﻿using System.IO.IsolatedStorage;
+﻿using System;
+using System.IO;
+using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
 using GpodderLib.RemoteServices;
 using GpodderLib.RemoteServices.Configuration;
@@ -8,35 +10,46 @@ namespace GpodderLib
     public class PodcastLibrary
     {
         private readonly string _applicationName;
-        private readonly IsolatedStorageFile _storage;
+        private readonly Stream _configurationDataStream;
 
-        public PodcastLibrary(string applicationName, IsolatedStorageFile storage)
+        private bool _initialized;
+
+
+        public PodcastLibrary(string applicationName, Stream configurationDataStream)
         {
             _applicationName = applicationName;
-            _storage = storage;
+            _configurationDataStream = configurationDataStream;
         }
+
+        
 
         public async Task<bool> Login()
         {
-            if (!await Init())
-                return false;
+            CheckInitialized();
 
             return true;
         }
+        
 
-        private async Task<bool> Init()
+        private void RegisterRemoteServices()
+        {
+            ServiceLocator.Instance.RegisterService(typeof(ConfigurationService), new ConfigurationService());
+
+        }
+
+        public async Task Init()
         {
             ServiceLocator.Instance.RegisterService(typeof(StaticConfiguration), new StaticConfiguration());
-
+            ServiceLocator.Instance.RegisterService(typeof(DynamicConfiguration), new DynamicConfiguration(_configurationDataStream));
             ServiceLocator.Instance.RegisterService(typeof(HttpRequestFactory), new HttpRequestFactory(_applicationName));
 
+            _initialized = true;
+        }
 
-            ServiceLocator.Instance.RegisterService(typeof(ConfigurationService), new ConfigurationService(_storage));
-
-
-            await cs.Init();
-
-            return true;
+        private void CheckInitialized()
+        {
+            if(!_initialized)
+                throw new InvalidOperationException("Try Init() it first.");
         }
     }
 }

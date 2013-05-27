@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace GpodderLib.RemoteServices.Configuration.Dto
 {
     [DataContract]
-    public class ClientConfig
+    class ClientConfig
     {
         [DataMember(Name = "mygpo")]
         public GpodderServiceConfig ApiConfig { get; set; }

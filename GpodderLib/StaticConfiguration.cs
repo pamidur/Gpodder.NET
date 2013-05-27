@@ -1,6 +1,6 @@
 ﻿namespace GpodderLib
 {
-    public class StaticConfiguration
+    class StaticConfiguration
     {
         /* Gpodder service related settings */
         public readonly string ClientConfigUri = "https://gpodder.net/clientconfig.json";

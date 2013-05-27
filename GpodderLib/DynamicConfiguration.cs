@@ -1,44 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using GpodderLib.RemoteServices.Configuration;
 using GpodderLib.RemoteServices.Configuration.Dto;
 
 namespace GpodderLib
 {
+    [DataContract]
     class DynamicConfiguration
     {
-        public async Task Init()
+        [DataMember]
+        public DateTimeOffset LastServerSync { get; set; }
+
+        [DataMember]
+        public DateTimeOffset LastClientConfigSync { get; set; }
+
+        [DataMember]
+        public ClientConfig ClientConfigData { get; set; }
+
+        private readonly Stream _configurationData;
+        private ConfigurationService _configurationService;
+
+        public DynamicConfiguration(Stream configurationData)
         {
-            if (_storage.FileExists(StaticConfiguration.ConfigurationServiceDataFilename))
+            _configurationData = configurationData;
+
+            if (!_configurationData.CanRead || !_configurationData.CanWrite || !_configurationData.CanSeek)
+                throw new ArgumentException(
+                    "Configuration data stream should be able to be read, written and sought over.");
+
+        }
+
+        public void Init()
+        {
+            _configurationService = ServiceLocator.Instance.GetService<ConfigurationService>();
+        }
+
+        public async Task UpdateClientConfig(bool force = false)
+        {
+            if (ClientConfigData == null || LastClientConfigSync.AddSeconds(ClientConfigData.UpdateTimeout) > DateTimeOffset.UtcNow || force)
             {
-                using (var configFile = _storage.OpenFile(StaticConfiguration.ConfigurationServiceDataFilename, FileMode.Open, FileAccess.Read))
-                    _configuration = (ClientConfig)_serializer.ReadObject(configFile);
-            }
-
-            if (_configuration == null ||
-                _configuration.LastUpdate.AddSeconds(_configuration.UpdateTimeout) > DateTimeOffset.UtcNow)
-            {
-                var req = _requestFactory.CreateRequest(new Uri(_staticConfiguration.ClientConfigUri));
-
-#if (WP80)
-                var res = (HttpWebResponse) await Task.Factory.FromAsync(req.BeginGetResponse, ar => req.EndGetResponse(ar), null);
-#endif
-
-#if (NET45)
-                var res = (HttpWebResponse)await req.GetResponseAsync();
-#endif
-                //if (res.StatusCode != HttpStatusCode.OK)
-                //    return false;
-
-                _configuration = (ClientConfig)_serializer.ReadObject(res.GetResponseStream());
-                _configuration.LastUpdate = DateTimeOffset.UtcNow;
-
-                using (var configFile = _storage.OpenFile(StaticConfiguration.ConfigurationServiceDataFilename, FileMode.Create, FileAccess.Write))
-                    _serializer.WriteObject(configFile, _configuration);
+                ClientConfigData = await _configurationService.QueryClientConfig();
             }
         }
     }
