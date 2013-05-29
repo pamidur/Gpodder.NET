@@ -29,22 +29,23 @@ namespace GpodderLib
 
             return true;
         }
-        
-
-        private void RegisterRemoteServices()
-        {
-            ServiceLocator.Instance.RegisterService(typeof(ConfigurationService), new ConfigurationService());
-
-        }
 
         public async Task Init()
         {
             ServiceLocator.Instance.RegisterService(typeof(StaticConfiguration), new StaticConfiguration());
             ServiceLocator.Instance.RegisterService(typeof(DynamicConfiguration), new DynamicConfiguration(_configurationDataStream));
-            ServiceLocator.Instance.RegisterService(typeof(HttpRequestFactory), new HttpRequestFactory(_applicationName));
+            ServiceLocator.Instance.RegisterService(typeof(RemoteServiceBase), new RemoteServiceBase(_applicationName));
+
+            RegisterRemoteServices();
 
             _initialized = true;
         }
+
+        private void RegisterRemoteServices()
+        {
+            ServiceLocator.Instance.RegisterService(typeof(ConfigurationService), new ConfigurationService());
+        }
+       
 
         private void CheckInitialized()
         {

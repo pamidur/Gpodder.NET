@@ -9,12 +9,12 @@ namespace GpodderLib.RemoteServices.Configuration
     class ConfigurationService
     {
         private readonly DataContractJsonSerializer _serializer = new DataContractJsonSerializer(typeof(ClientConfig));
-        private readonly HttpRequestFactory _requestFactory;
+        private readonly RemoteServiceBase _requestFactory;
         private readonly StaticConfiguration _staticConfiguration;
 
         public ConfigurationService()
         {
-            _requestFactory = ServiceLocator.Instance.GetService<HttpRequestFactory>();
+            _requestFactory = ServiceLocator.Instance.GetService<RemoteServiceBase>();
             _staticConfiguration = ServiceLocator.Instance.GetService<StaticConfiguration>();
         }
 
