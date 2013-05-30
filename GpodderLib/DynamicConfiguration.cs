@@ -19,30 +19,12 @@ namespace GpodderLib
         [DataMember]
         public ClientConfig ClientConfigData { get; set; }
 
-        private readonly Stream _configurationData;
-        private ConfigurationService _configurationService;
+        public string DeviceId { get; set; }
 
-        public DynamicConfiguration(Stream configurationData)
-        {
-            _configurationData = configurationData;
+        [DataMember]
+        public string Username { get; set; }
 
-            if (!_configurationData.CanRead || !_configurationData.CanWrite || !_configurationData.CanSeek)
-                throw new ArgumentException(
-                    "Configuration data stream should be able to be read, written and sought over.");
-
-        }
-
-        public void Init()
-        {
-            _configurationService = ServiceLocator.Instance.GetService<ConfigurationService>();
-        }
-
-        public async Task UpdateClientConfig(bool force = false)
-        {
-            if (ClientConfigData == null || LastClientConfigSync.AddSeconds(ClientConfigData.UpdateTimeout) > DateTimeOffset.UtcNow || force)
-            {
-                ClientConfigData = await _configurationService.QueryClientConfig();
-            }
-        }
+        [DataMember]
+        public string Password { get; set; }
     }
 }

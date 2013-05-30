@@ -1,20 +1,26 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 
 namespace GpodderLib.RemoteServices
 {
-    public class RemoteServiceBase
+    abstract class RemoteServiceBase
     {
         private readonly string _userAgent;
+        protected DynamicConfiguration DynamicConfiguration { get; private set; }
+        protected StaticConfiguration StaticConfiguration { get; private set; }
 
-        public RemoteServiceBase(string applicationName)
+        protected RemoteServiceBase()
         {
-            _userAgent = applicationName + " (GpodderLib)";
+            StaticConfiguration = ServiceLocator.Instance.GetService<StaticConfiguration>();
+            DynamicConfiguration = ServiceLocator.Instance.GetService<DynamicConfiguration>();
+
+            _userAgent = DynamicConfiguration.DeviceId + " (GpodderLib)";
         }
 
-        public HttpWebRequest CreateRequest(Uri uri)
+        protected virtual HttpWebRequest CreateRequest(Uri uri)
         {
             var req = WebRequest.CreateHttp(uri);
             req.KeepAlive = true;
@@ -25,13 +31,23 @@ namespace GpodderLib.RemoteServices
 #if (NET45)
             req.UserAgent = _userAgent;
 #endif
+            
+            req.Headers.Add(AppendAdditionalHeader());
 
             return req;
         }
 
+        protected virtual NameValueCollection AppendAdditionalHeader()
+        {
+            return new WebHeaderCollection();
+        }
 
+        protected async Task<TR> Query<TR>(Uri uri)
+        {
+            return await Query<object, TR>(uri, null);
+        }
 
-        public async Task<TR> Query<TA, TR>(Uri uri, TA argument)
+        protected async Task<TR> Query<TA, TR>(Uri uri, TA argument)
         {
             var request = CreateRequest(uri);
 
