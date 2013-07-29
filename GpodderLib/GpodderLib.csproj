@@ -47,6 +47,9 @@
     <Compile Include="RemoteServices\Configuration\Dto\ClientConfig.cs" />
     <Compile Include="RemoteServices\Configuration\Dto\GpodderServiceConfig.cs" />
     <Compile Include="RemoteServices\SecuredRemoteServiceBase.cs" />
+    <Compile Include="RemoteServices\Suggestions\Dto\SuggestionItem.cs" />
+    <Compile Include="RemoteServices\Suggestions\Dto\SuggestionSet.cs" />
+    <Compile Include="RemoteServices\Suggestions\SuggestionsService.cs" />
     <Compile Include="ServiceLocator.cs" />
     <Compile Include="StaticConfiguration.cs" />
   </ItemGroup>

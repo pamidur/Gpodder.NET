@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using GpodderLib.RemoteServices.Configuration;
@@ -10,6 +11,11 @@ namespace GpodderLib
     [DataContract]
     class DynamicConfiguration
     {
+        public DynamicConfiguration()
+        {
+            ClientSession = new CookieContainer();
+        }
+
         [DataMember]
         public DateTimeOffset LastServerSync { get; set; }
 
@@ -26,5 +32,10 @@ namespace GpodderLib
 
         [DataMember]
         public string Password { get; set; }
+
+        public bool IsClientAuthenticated { get; set; }
+
+        [DataMember]
+        public CookieContainer ClientSession { get; set; }
     }
 }

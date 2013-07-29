@@ -20,7 +20,7 @@ namespace GpodderLib.RemoteServices
             _userAgent = DynamicConfiguration.DeviceId + " (GpodderLib)";
         }
 
-        protected virtual HttpWebRequest CreateRequest(Uri uri)
+        protected HttpWebRequest CreateRequest(Uri uri)
         {
             var req = WebRequest.CreateHttp(uri);
             req.KeepAlive = true;
@@ -42,14 +42,16 @@ namespace GpodderLib.RemoteServices
             return new WebHeaderCollection();
         }
 
-        protected async Task<TR> Query<TR>(Uri uri)
+        protected virtual async Task<TR> Query<TR>(Uri uri)
         {
             return await Query<object, TR>(uri, null);
         }
 
-        protected async Task<TR> Query<TA, TR>(Uri uri, TA argument)
+        protected virtual async Task<TR> Query<TA, TR>(Uri uri, TA argument)
         {
             var request = CreateRequest(uri);
+
+            request.CookieContainer = DynamicConfiguration.ClientSession;
 
 #if (WP80)
             var response = (HttpWebResponse) await Task.Factory.FromAsync(request.BeginGetResponse, ar => request.EndGetResponse(ar), null);

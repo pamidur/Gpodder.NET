@@ -1,47 +1,61 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Net;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace GpodderLib.RemoteServices.Authentication
-//{
-//    class AuthenticationService
-//    {
-//        private const string UsernameShortcut = "{username}";
-//        private const string ApiUri = "/api/2/auth/" + UsernameShortcut + "/login.json";
+namespace GpodderLib.RemoteServices.Authentication
+{
+    class AuthenticationService : RemoteServiceBase
+    {
+        private const string ApiUri = "/api/2/auth/{username}/login.json";
 
-//        private RemoteServiceBase _requestFactory;
-//        private DynamicConfiguration _dynamicConfiguration;
+        public async Task<bool> Login(string userName, string password)
+        {
+            var authUri = new Uri(DynamicConfiguration.ClientConfigData.ApiConfig.BaseUrl, ApiUri.Replace("{username}", userName));
 
-//        public AuthenticationService()
-//        {
-//            _requestFactory = ServiceLocator.Instance.GetService<RemoteServiceBase>();
-//            _dynamicConfiguration = ServiceLocator.Instance.GetService<DynamicConfiguration>();
-//        }
+            var credentialsStr = userName + ":" + password;
+            var credentials64Str = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentialsStr));
 
-//        public async Task<bool> Login(string userName, string password)
-//        {
-//            var authUri = new Uri(_dynamicConfiguration.ClientConfigData.ApiConfig.BaseUrl,
-//                                  ApiUri.Replace(UsernameShortcut, userName));
+            var authRequest = CreateRequest(authUri);
 
-//            var credentialsStr = userName + ":" + password;
-//            var credentials64Str = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentialsStr));
+            authRequest.CookieContainer = DynamicConfiguration.ClientSession;
+            authRequest.Method = "POST";
+            authRequest.Headers.Add("Authorization", "Basic " + credentials64Str);
 
-//            var authRequest = _requestFactory.CreateRequest(authUri);
+#if (WP80)
+            var response = (HttpWebResponse) await Task.Factory.FromAsync(authRequest.BeginGetResponse, ar => authRequest.EndGetResponse(ar), null);
+#endif
+#if (NET45)
+            var response = (HttpWebResponse)await authRequest.GetResponseAsync();
+#endif
 
-//            authRequest.Method = "POST";
-//            authRequest.Headers.Add("Authorization","Basic " + credentials64Str);
+            return true;
+        }
 
-//#if (WP80)
-//            var response = (HttpWebResponse) await Task.Factory.FromAsync(authRequest.BeginGetResponse, ar => authRequest.EndGetResponse(ar), null);
-//#endif
-//#if (NET45)
-//            var response = (HttpWebResponse) await authRequest.GetResponseAsync();
-//#endif
+        public void CheckLogin()
+        {
+            Coockie  
 
+            || (
+                ["sessionid"].Expired))
+            {
+                
+            }
+        }
 
-//        }
-//    }
-//}
+        public bool IsLoogedIn
+        {
+            get
+            {
+                if (DynamicConfiguration.ClientSession.Count == 0)
+                    return false;
+
+                var coockiesForApi =
+                    DynamicConfiguration.ClientSession.GetCookies(
+                        DynamicConfiguration.ClientConfigData.ApiConfig.BaseUrl);
+            }
+        }
+    }
+}
