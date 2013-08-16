@@ -1,28 +1,48 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
+using GpodderLib.LocalServices;
+using GpodderLib.RemoteServices.Configuration;
 
 namespace GpodderLib.RemoteServices
 {
-    abstract class RemoteServiceBase
+    abstract class RemoteServiceBase : ServiceBase
     {
-        private readonly string _userAgent;
-        protected DynamicConfiguration DynamicConfiguration { get; private set; }
-        protected StaticConfiguration StaticConfiguration { get; private set; }
+        private string _userAgent;
+        protected DynamicConfigurationService DynamicConfigurationService { get; private set; }
+        protected StaticConfigurationService StaticConfigurationService { get; private set; }
+        protected ConfigurationService ConfigurationService { get; private set; }
 
-        protected RemoteServiceBase()
+        public override async Task Init()
         {
-            StaticConfiguration = ServiceLocator.Instance.GetService<StaticConfiguration>();
-            DynamicConfiguration = ServiceLocator.Instance.GetService<DynamicConfiguration>();
+            await base.Init();
 
-            _userAgent = DynamicConfiguration.DeviceId + " (GpodderLib)";
+            StaticConfigurationService = ServiceLocator.Get<StaticConfigurationService>();
+            DynamicConfigurationService = ServiceLocator.Get<DynamicConfigurationService>();
+
+            ConfigurationService = ServiceLocator.Get<ConfigurationService>();
+
+            _userAgent = DynamicConfigurationService.DeviceId + " (GpodderLib)";
         }
 
-        protected HttpWebRequest CreateRequest(Uri uri)
+        protected string FillInUriShortcups(string input)
+        {
+            var output = input.Replace("{username}", DynamicConfigurationService.Username);
+            output = output.Replace("{device-id}", DynamicConfigurationService.DeviceId);
+            return output;
+        }
+       
+
+        protected async Task<HttpWebRequest> CreateRequest(Uri uri, object outgoingContent = null)
         {
             var req = WebRequest.CreateHttp(uri);
+
+#if (DEBUG)
+            Console.WriteLine("Requesting " + uri);
+#endif
             req.KeepAlive = true;
 
 #if (WP80)
@@ -33,6 +53,14 @@ namespace GpodderLib.RemoteServices
 #endif
             
             req.Headers.Add(AppendAdditionalHeader());
+            req.CookieContainer = DynamicConfigurationService.ClientSession;
+
+            if (outgoingContent != null)
+            {
+                req.Method = "POST";
+
+                //req.GetRequestStream().WriteAsync()
+            }
 
             return req;
         }
@@ -49,9 +77,7 @@ namespace GpodderLib.RemoteServices
 
         protected virtual async Task<TR> Query<TA, TR>(Uri uri, TA argument)
         {
-            var request = CreateRequest(uri);
-
-            request.CookieContainer = DynamicConfiguration.ClientSession;
+            var request = await CreateRequest(uri);
 
 #if (WP80)
             var response = (HttpWebResponse) await Task.Factory.FromAsync(request.BeginGetResponse, ar => request.EndGetResponse(ar), null);
@@ -61,6 +87,10 @@ namespace GpodderLib.RemoteServices
 #endif
             //if (res.StatusCode != HttpStatusCode.OK)
             //    return false;
+
+            
+            //var a = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            
 
             var serializer = new DataContractJsonSerializer(typeof (TR));
             var result = (TR) serializer.ReadObject(response.GetResponseStream());

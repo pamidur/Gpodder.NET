@@ -1,26 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using GpodderLib.RemoteServices.Configuration;
 
 namespace GpodderLib.RemoteServices.Authentication
 {
-    class AuthenticationService : RemoteServiceBase
+    internal class AuthenticationService : RemoteServiceBase
     {
+        private readonly string _userName;
+        private readonly string _password;
         private const string ApiUri = "/api/2/auth/{username}/login.json";
 
-        public async Task<bool> Login(string userName, string password)
-        {
-            var authUri = new Uri(DynamicConfiguration.ClientConfigData.ApiConfig.BaseUrl, ApiUri.Replace("{username}", userName));
+        protected ConfigurationService ConfigurationService { get; set; }
 
-            var credentialsStr = userName + ":" + password;
+        public AuthenticationService(string userName, string password)
+        {
+            _userName = userName;
+            _password = password;
+        }
+
+        public async Task<bool> Login()
+        {
+            var configData = await ConfigurationService.GetClientConfig();
+
+            var authUri = new Uri(configData.ApiConfig.BaseUrl,
+                                  ApiUri.Replace("{username}", DynamicConfigurationService.Username));
+
+            var credentialsStr = DynamicConfigurationService.Username + ":" + DynamicConfigurationService.Password;
             var credentials64Str = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentialsStr));
 
             var authRequest = CreateRequest(authUri);
 
-            authRequest.CookieContainer = DynamicConfiguration.ClientSession;
+            authRequest.CookieContainer = DynamicConfigurationService.ClientSession;
             authRequest.Method = "POST";
             authRequest.Headers.Add("Authorization", "Basic " + credentials64Str);
 
@@ -28,34 +40,35 @@ namespace GpodderLib.RemoteServices.Authentication
             var response = (HttpWebResponse) await Task.Factory.FromAsync(authRequest.BeginGetResponse, ar => authRequest.EndGetResponse(ar), null);
 #endif
 #if (NET45)
-            var response = (HttpWebResponse)await authRequest.GetResponseAsync();
+            var response = (HttpWebResponse) await authRequest.GetResponseAsync();
 #endif
+
+            var coockiesForApi = DynamicConfigurationService.ClientSession.GetCookies(configData.ApiConfig.BaseUrl);
+            DynamicConfigurationService.SessionId = coockiesForApi["sessionid"];
 
             return true;
         }
 
-        public void CheckLogin()
+        public override async Task Init()
         {
-            Coockie  
+            await base.Init();
 
-            || (
-                ["sessionid"].Expired))
-            {
-                
-            }
-        }
+            ConfigurationService = ServiceLocator.Get<ConfigurationService>();
 
-        public bool IsLoogedIn
-        {
-            get
-            {
-                if (DynamicConfiguration.ClientSession.Count == 0)
-                    return false;
+            if (DynamicConfigurationService.Username != _userName ||
+                        DynamicConfigurationService.Password != _password)
+                DynamicConfigurationService.SessionId = null;
 
-                var coockiesForApi =
-                    DynamicConfiguration.ClientSession.GetCookies(
-                        DynamicConfiguration.ClientConfigData.ApiConfig.BaseUrl);
-            }
+            DynamicConfigurationService.Username = _userName;
+            DynamicConfigurationService.Password = _password;
+
+            DynamicConfigurationService.ClientSession = new CookieContainer();
+
+            if (DynamicConfigurationService.SessionId != null)
+                DynamicConfigurationService.ClientSession.Add(
+                    (await ConfigurationService.GetClientConfig()).ApiConfig.BaseUrl,
+                    DynamicConfigurationService.SessionId);
+            
         }
     }
 }

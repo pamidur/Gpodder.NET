@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GpodderLib.RemoteServices.Authentication;
 
@@ -11,17 +8,17 @@ namespace GpodderLib.RemoteServices
     {
         protected AuthenticationService AuthenticationService { get; set; }
 
-        protected SecuredRemoteServiceBase()
+        public override async Task Init()
         {
-            AuthenticationService = ServiceLocator.Instance.GetService<AuthenticationService>();
+            await base.Init();
+            AuthenticationService = ServiceLocator.Get<AuthenticationService>();
         }
 
         protected override async Task<TR> Query<TA, TR>(Uri uri, TA argument)
         {
-            if (!DynamicConfiguration.IsClientAuthenticated)
+            if (!DynamicConfigurationService.IsLoogedIn)
             {
-                await AuthenticationService.Login(DynamicConfiguration.Username, DynamicConfiguration.Password);
-                DynamicConfiguration.IsClientAuthenticated = true;
+                await AuthenticationService.Login();
             }
 
             return await base.Query<TA, TR>(uri, argument);

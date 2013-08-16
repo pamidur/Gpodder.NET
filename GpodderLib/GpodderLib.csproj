@@ -38,7 +38,11 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DynamicConfiguration.cs" />
+    <Compile Include="LocalServices\DynamicConfigurationService.cs" />
+    <Compile Include="RemoteServices\Devices\DevicesService.cs" />
+    <Compile Include="RemoteServices\Devices\Dto\Device.cs" />
+    <Compile Include="RemoteServices\Devices\Dto\DeviceSet.cs" />
+    <Compile Include="RemoteServices\Devices\Dto\DeviceType.cs" />
     <Compile Include="RemoteServices\RemoteServiceBase.cs" />
     <Compile Include="PodcastLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -47,11 +51,12 @@
     <Compile Include="RemoteServices\Configuration\Dto\ClientConfig.cs" />
     <Compile Include="RemoteServices\Configuration\Dto\GpodderServiceConfig.cs" />
     <Compile Include="RemoteServices\SecuredRemoteServiceBase.cs" />
+    <Compile Include="ServiceBase.cs" />
     <Compile Include="RemoteServices\Suggestions\Dto\SuggestionItem.cs" />
     <Compile Include="RemoteServices\Suggestions\Dto\SuggestionSet.cs" />
     <Compile Include="RemoteServices\Suggestions\SuggestionsService.cs" />
     <Compile Include="ServiceLocator.cs" />
-    <Compile Include="StaticConfiguration.cs" />
+    <Compile Include="LocalServices\StaticConfigurationService.cs" />
   </ItemGroup>
   <ImportGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

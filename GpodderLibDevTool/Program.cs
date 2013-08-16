@@ -5,22 +5,23 @@ using GpodderLib;
 
 namespace GpodderLibDevTool
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var loginResult = Login().Result;
+            Login().Wait();
         }
 
-        static async Task<bool> Login()
+        private static async Task Login()
         {
             var storage = new FileStream("gpodder.data", FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
-            var client = new PodcastLibrary("DevTool",storage);
+            using (var client = await PodcastLibrary.Init(storage, "DevTool","test1","test1"))
+            {
+                var devs = await client.GetDevices();
 
-            await client.Init();
-
-            return await client.Login();
+                await Task.Delay(int.MaxValue);
+            }
         }
     }
 }

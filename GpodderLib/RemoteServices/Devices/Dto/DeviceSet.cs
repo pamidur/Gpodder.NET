@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace GpodderLib.RemoteServices.Suggestions.Dto
+namespace GpodderLib.RemoteServices.Devices.Dto
 {
     [CollectionDataContract]
-    internal class SuggestionSet : List<SuggestionItem>
+    class DeviceSet : List<Device>
     {
     }
 }

@@ -2,102 +2,70 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
+using GpodderLib.LocalServices;
 using GpodderLib.RemoteServices;
+using GpodderLib.RemoteServices.Authentication;
 using GpodderLib.RemoteServices.Configuration;
+using GpodderLib.RemoteServices.Devices;
+using GpodderLib.RemoteServices.Devices.Dto;
+using GpodderLib.RemoteServices.Suggestions;
 
 namespace GpodderLib
 {
-    public class PodcastLibrary
+    public class PodcastLibrary : IDisposable
     {
-        private readonly string _applicationName;
+        private readonly ServiceLocator _serviceLocator;
         private readonly Stream _configurationData;
+        private readonly string _applicationName;
+        private readonly string _username;
+        private readonly string _password;
 
-        private bool _initialized;
-
-        private DynamicConfiguration Configuration { get; set; }
-
-        public PodcastLibrary(string applicationName, Stream configurationData)
+        private PodcastLibrary(Stream configurationData, string applicationName, string username, string password)
         {
-            _applicationName = applicationName;
-
             _configurationData = configurationData;
-
-            if (!_configurationData.CanRead || !_configurationData.CanWrite || !_configurationData.CanSeek)
-                throw new ArgumentException(
-                    "Configuration data stream should be able to be read, written and sought over.");
+            _applicationName = applicationName;
+            _username = username;
+            _password = password;
+            _serviceLocator = new ServiceLocator();
         }
 
-        
-
-        public async Task<bool> Login()
+        public async Task<List<Device>> GetDevices()
         {
-            CheckInitialized();
-
-            return true;
+            return await _serviceLocator.Get<DevicesService>().QueryDevices();
         }
 
-        public async Task Init()
+        private async Task Bootstrap()
         {
-            var loadConfigTask = LoadDynamicConfiguration();
-
-            ServiceLocator.Instance.RegisterService(typeof (StaticConfiguration), new StaticConfiguration());
-
-            Configuration = await loadConfigTask;
-            Configuration.DeviceId = _applicationName;
-            ServiceLocator.Instance.RegisterService(typeof (DynamicConfiguration), Configuration);
-
-            var bootstrapTasks = new List<Task>
-                {
-                    RegisterRemoteServices(),
-                    RegisterLocalServices()
-                };
-
-            await Task.WhenAll(bootstrapTasks);
-            _initialized = true;
-        }
-
-        private async Task RegisterLocalServices()
-        {
+            _serviceLocator.RegisterService(typeof(StaticConfigurationService), new StaticConfigurationService());
+            _serviceLocator.RegisterService(typeof(DynamicConfigurationService), await DynamicConfigurationService.LoadFrom(_configurationData));
+            _serviceLocator.RegisterService(typeof(ConfigurationService), new ConfigurationService());
+            _serviceLocator.RegisterService(typeof(AuthenticationService), new AuthenticationService(_username, _password));
+            _serviceLocator.RegisterService(typeof(SuggestionsService), new SuggestionsService());
+            _serviceLocator.RegisterService(typeof(DevicesService), new DevicesService());
             
+            await _serviceLocator.InitServices();
         }
 
-        private async Task RegisterRemoteServices()
+        public void Dispose()
         {
-            var configService = new ConfigurationService();
-            ServiceLocator.Instance.RegisterService(typeof(ConfigurationService), configService);
-
-            var updateClientConfigTask = configService.UpdateClientConfig();
-
-            //register other services
-
-            await updateClientConfigTask;
+            _serviceLocator.Get<DynamicConfigurationService>().SaveTo(_configurationData).Wait();
+            GC.SuppressFinalize(this);
         }
 
-        private void CheckInitialized()
+        public static async Task<PodcastLibrary> Init(Stream configurationData, string applicationName, string username,
+                                                      string password)
         {
-            if(!_initialized)
-                throw new InvalidOperationException("Try Init() it first.");
+            var lib = new PodcastLibrary(configurationData, applicationName, username, password);
+            await lib.Bootstrap();
+            return lib;
         }
 
-        private Task<DynamicConfiguration> LoadDynamicConfiguration()
+        ~PodcastLibrary()
         {
-            return Task.Run(() =>
-                {
-                    var serializer = new DataContractJsonSerializer(typeof (DynamicConfiguration));
-                    _configurationData.Seek(0, SeekOrigin.Begin);
-
-                    try
-                    {
-                        return (DynamicConfiguration)serializer.ReadObject(_configurationData);
-                    }
-                    catch
-                    {
-                        return new DynamicConfiguration();
-                    }
-
-                });
+            Dispose();
         }
     }
 }

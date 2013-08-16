@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace GpodderLib
 {
     class ServiceLocator
     {
-        private static readonly Lazy<ServiceLocator> _serviceLocatorInializer = new Lazy<ServiceLocator>(()=>new ServiceLocator()); 
-        public static ServiceLocator Instance
+        private readonly IDictionary<Type, ServiceBase> _instantiatedServices;
+
+        private bool _initialized;
+
+        public ServiceLocator()
         {
-            get { return _serviceLocatorInializer.Value; }
+            _instantiatedServices = new Dictionary<Type, ServiceBase>();
         }
 
-        private readonly IDictionary<Type, object> _instantiatedServices;
-
-        internal ServiceLocator()
-        {
-            _instantiatedServices = new Dictionary<Type, object>();
-        }
-
-        public T GetService<T>()
+        public T Get<T>() where T : ServiceBase
         {
             if (_instantiatedServices.ContainsKey(typeof (T)))
             {
@@ -28,9 +26,26 @@ namespace GpodderLib
             throw new ApplicationException("The requested service is not registered");
         }
 
-        public void RegisterService(Type contract, object service)
+        public void RegisterService(Type contract, ServiceBase service)
         {
+            if(_initialized)
+                throw new Exception("Services already initialized. Connot register new one!" );
+
+            service.ServiceLocator = this;
             _instantiatedServices.Add(contract, service);
+        }
+
+        public async Task InitServices()
+        {
+            if (_initialized)
+                throw new Exception("Services already initialized. Connot initialize them anew!");
+
+            //await Task.WhenAll(_instantiatedServices.Values.Select(s => s.Init()));
+
+            foreach (var instantiatedService in _instantiatedServices.Values)
+                await instantiatedService.Init();
+
+            _initialized = true;
         }
     }
 }
