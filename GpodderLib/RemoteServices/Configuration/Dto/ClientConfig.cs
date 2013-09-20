@@ -3,7 +3,7 @@
 namespace GpodderLib.RemoteServices.Configuration.Dto
 {
     [DataContract]
-    class ClientConfig
+    public class ClientConfig
     {
         [DataMember(Name = "mygpo")]
         public GpodderServiceConfig ApiConfig { get; set; }

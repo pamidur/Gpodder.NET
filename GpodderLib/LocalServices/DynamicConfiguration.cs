@@ -4,13 +4,12 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
-using GpodderLib.RemoteServices.Configuration;
 using GpodderLib.RemoteServices.Configuration.Dto;
 
 namespace GpodderLib.LocalServices
 {
     [DataContract]
-    internal class DynamicConfigurationService : ServiceBase
+    public class DynamicConfiguration
     {
         [DataMember]
         public DateTimeOffset LastServerSync { get; set; }
@@ -53,7 +52,7 @@ namespace GpodderLib.LocalServices
         {
             return Task.Run(() =>
             {
-                var serializer = new DataContractJsonSerializer(typeof(DynamicConfigurationService));
+                var serializer = new DataContractJsonSerializer(typeof(DynamicConfiguration));
                 configurationData.Seek(0, SeekOrigin.Begin);
                 serializer.WriteObject(configurationData, this);
                 configurationData.SetLength(configurationData.Position);
@@ -61,7 +60,7 @@ namespace GpodderLib.LocalServices
         }
 
 
-        public static Task<DynamicConfigurationService> LoadFrom(Stream configurationData)
+        public static Task<DynamicConfiguration> LoadFrom(Stream configurationData)
         {
             if (!configurationData.CanRead || !configurationData.CanWrite || !configurationData.CanSeek)
                 throw new ArgumentException(
@@ -69,16 +68,16 @@ namespace GpodderLib.LocalServices
 
             return Task.Run(() =>
             {
-                var serializer = new DataContractJsonSerializer(typeof(DynamicConfigurationService));
+                var serializer = new DataContractJsonSerializer(typeof(DynamicConfiguration));
                 configurationData.Seek(0, SeekOrigin.Begin);
 
                 try
                 {
-                    return (DynamicConfigurationService)serializer.ReadObject(configurationData);
+                    return (DynamicConfiguration)serializer.ReadObject(configurationData);
                 }
                 catch
                 {
-                    return new DynamicConfigurationService();
+                    return new DynamicConfiguration();
                 }
 
             });

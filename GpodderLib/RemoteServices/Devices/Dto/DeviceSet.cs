@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace GpodderLib.RemoteServices.Devices.Dto
 {
     [CollectionDataContract]
-    class DeviceSet : List<Device>
+    public class DeviceSet : List<Device>
     {
     }
 }

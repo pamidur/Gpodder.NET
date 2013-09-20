@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace GpodderLib.RemoteServices.Suggestions.Dto
 {
     [CollectionDataContract]
-    internal class SuggestionSet : List<SuggestionItem>
+    public class SuggestionSet : List<SuggestionItem>
     {
     }
 }

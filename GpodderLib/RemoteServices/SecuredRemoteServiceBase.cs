@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GpodderLib.LocalServices;
 using GpodderLib.RemoteServices.Authentication;
+using GpodderLib.RemoteServices.Configuration;
 
 namespace GpodderLib.RemoteServices
 {
-    abstract class SecuredRemoteServiceBase:RemoteServiceBase
+    public abstract class SecuredRemoteServiceBase:ConfigurableRemoteServiceBase
     {
-        protected AuthenticationService AuthenticationService { get; set; }
+        protected AuthenticationService AuthenticationService { get; private set; }
 
-        public override async Task Init()
+        protected SecuredRemoteServiceBase(
+            StaticConfiguration staticConfiguration,
+            DynamicConfiguration dynamicConfiguration, 
+            ConfigurationService configurationService,
+            AuthenticationService authenticationService) 
+            : base(staticConfiguration, dynamicConfiguration, configurationService)
         {
-            await base.Init();
-            AuthenticationService = ServiceLocator.Get<AuthenticationService>();
+            AuthenticationService = authenticationService;
         }
 
         protected override async Task<TR> Query<TA, TR>(Uri uri, TA argument)
         {
-            if (!DynamicConfigurationService.IsLoogedIn)
+            if (!DynamicConfiguration.IsLoogedIn)
             {
                 await AuthenticationService.Login();
             }

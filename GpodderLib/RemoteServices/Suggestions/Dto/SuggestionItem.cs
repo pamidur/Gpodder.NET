@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace GpodderLib.RemoteServices.Suggestions.Dto
 {
     [DataContract]
-    class SuggestionItem
+    public class SuggestionItem
     {
         [DataMember(Name = "website")]
         public Uri Website { get; set; }

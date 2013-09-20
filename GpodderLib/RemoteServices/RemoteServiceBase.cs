@@ -5,33 +5,27 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 using GpodderLib.LocalServices;
-using GpodderLib.RemoteServices.Configuration;
 
 namespace GpodderLib.RemoteServices
 {
-    abstract class RemoteServiceBase : ServiceBase
+    public abstract class RemoteServiceBase
     {
-        private string _userAgent;
-        protected DynamicConfigurationService DynamicConfigurationService { get; private set; }
-        protected StaticConfigurationService StaticConfigurationService { get; private set; }
-        protected ConfigurationService ConfigurationService { get; private set; }
+        private readonly string _userAgent;
 
-        public override async Task Init()
+        protected DynamicConfiguration DynamicConfiguration { get; private set; }
+        protected StaticConfiguration StaticConfiguration { get; private set; }
+
+        protected RemoteServiceBase(StaticConfiguration staticConfiguration, DynamicConfiguration dynamicConfiguration)
         {
-            await base.Init();
-
-            StaticConfigurationService = ServiceLocator.Get<StaticConfigurationService>();
-            DynamicConfigurationService = ServiceLocator.Get<DynamicConfigurationService>();
-
-            ConfigurationService = ServiceLocator.Get<ConfigurationService>();
-
-            _userAgent = DynamicConfigurationService.DeviceId + " (GpodderLib)";
+            DynamicConfiguration = dynamicConfiguration;
+            StaticConfiguration = staticConfiguration;
+            _userAgent = DynamicConfiguration.DeviceId + " (GpodderLib)";
         }
 
         protected string FillInUriShortcups(string input)
         {
-            var output = input.Replace("{username}", DynamicConfigurationService.Username);
-            output = output.Replace("{device-id}", DynamicConfigurationService.DeviceId);
+            var output = input.Replace("{username}", DynamicConfiguration.Username);
+            output = output.Replace("{device-id}", DynamicConfiguration.DeviceId);
             return output;
         }
        
@@ -53,7 +47,7 @@ namespace GpodderLib.RemoteServices
 #endif
             
             req.Headers.Add(AppendAdditionalHeader());
-            req.CookieContainer = DynamicConfigurationService.ClientSession;
+            req.CookieContainer = DynamicConfiguration.ClientSession;
 
             if (outgoingContent != null)
             {

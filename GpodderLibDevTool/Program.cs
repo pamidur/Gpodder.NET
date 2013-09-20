@@ -16,11 +16,9 @@ namespace GpodderLibDevTool
         {
             var storage = new FileStream("gpodder.data", FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
-            using (var client = await PodcastLibrary.Init(storage, "DevTool","test1","test1"))
+            using (var client = await GpodderClient.Init(storage, "DevTool",))
             {
-                var devs = await client.GetDevices();
-
-                await Task.Delay(int.MaxValue);
+                var devs = await client.DevicesService.QueryDevices();
             }
         }
     }

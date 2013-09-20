@@ -38,25 +38,24 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LocalServices\DynamicConfigurationService.cs" />
+    <Compile Include="RemoteServices\ConfigurableRemoteServiceBase.cs" />
+    <Compile Include="LocalServices\DynamicConfiguration.cs" />
     <Compile Include="RemoteServices\Devices\DevicesService.cs" />
     <Compile Include="RemoteServices\Devices\Dto\Device.cs" />
     <Compile Include="RemoteServices\Devices\Dto\DeviceSet.cs" />
     <Compile Include="RemoteServices\Devices\Dto\DeviceType.cs" />
     <Compile Include="RemoteServices\RemoteServiceBase.cs" />
-    <Compile Include="PodcastLibrary.cs" />
+    <Compile Include="GpodderClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteServices\Authentication\AuthenticationService.cs" />
     <Compile Include="RemoteServices\Configuration\ConfigurationService.cs" />
     <Compile Include="RemoteServices\Configuration\Dto\ClientConfig.cs" />
     <Compile Include="RemoteServices\Configuration\Dto\GpodderServiceConfig.cs" />
     <Compile Include="RemoteServices\SecuredRemoteServiceBase.cs" />
-    <Compile Include="ServiceBase.cs" />
     <Compile Include="RemoteServices\Suggestions\Dto\SuggestionItem.cs" />
     <Compile Include="RemoteServices\Suggestions\Dto\SuggestionSet.cs" />
     <Compile Include="RemoteServices\Suggestions\SuggestionsService.cs" />
-    <Compile Include="ServiceLocator.cs" />
-    <Compile Include="LocalServices\StaticConfigurationService.cs" />
+    <Compile Include="LocalServices\StaticConfiguration.cs" />
   </ItemGroup>
   <ImportGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

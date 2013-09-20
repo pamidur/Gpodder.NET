@@ -1,25 +1,21 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GpodderLib.LocalServices;
 using GpodderLib.RemoteServices.Configuration.Dto;
 
 namespace GpodderLib.RemoteServices.Configuration
 {
-    class ConfigurationService : RemoteServiceBase
+    public class ConfigurationService : RemoteServiceBase
     {
         private Task<ClientConfig> _getConfigTask;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private readonly ManualResetEventSlim _initEvent = new ManualResetEventSlim();
+        private readonly Task _updateLoop;
 
-        public ConfigurationService()
-        {
-            UpdateConfigLoop(_cancellationTokenSource.Token);
-        }
 
-        public override async Task Init()
+        public ConfigurationService(StaticConfiguration staticConfiguration, DynamicConfiguration dynamicConfiguration) : base(staticConfiguration, dynamicConfiguration)
         {
-            await base.Init();
-            _initEvent.Set();
+            _updateLoop = UpdateConfigLoop(_cancellationTokenSource.Token);
         }
 
         public async Task<ClientConfig> GetClientConfig()
@@ -32,12 +28,12 @@ namespace GpodderLib.RemoteServices.Configuration
             _getConfigTask = QueryClientConfig(cancellationToken);
             await _getConfigTask;
             
-            var msToWaitBeforeUpdate = DynamicConfigurationService.ClientConfigData == null
+            var msToWaitBeforeUpdate = DynamicConfiguration.ClientConfigData == null
                                            ? 0
                                            : Convert.ToInt32(
-                                               (DynamicConfigurationService.ClientConfigData.UpdateTimeout -
+                                               (DynamicConfiguration.ClientConfigData.UpdateTimeout -
                                                 (DateTimeOffset.UtcNow -
-                                                 DynamicConfigurationService.LastClientConfigSync)
+                                                 DynamicConfiguration.LastClientConfigSync)
                                                     .TotalSeconds))*1000;
 
             await Task.Delay(msToWaitBeforeUpdate, cancellationToken);
@@ -48,19 +44,16 @@ namespace GpodderLib.RemoteServices.Configuration
 
         private async Task<ClientConfig> QueryClientConfig(CancellationToken cancellationToken)
         {
-            await Task.Run(() => _initEvent.Wait(cancellationToken), cancellationToken);
-
-            if (DynamicConfigurationService.ClientConfigData == null ||
-                DynamicConfigurationService.LastClientConfigSync.AddSeconds(
-                    DynamicConfigurationService.ClientConfigData.UpdateTimeout) < DateTimeOffset.UtcNow)
+            if (DynamicConfiguration.ClientConfigData == null ||
+                DynamicConfiguration.LastClientConfigSync.AddSeconds(
+                    DynamicConfiguration.ClientConfigData.UpdateTimeout) < DateTimeOffset.UtcNow)
             {
-                DynamicConfigurationService.ClientConfigData =
-                    await Query<ClientConfig>(new Uri(StaticConfigurationService.ClientConfigUri));
-                DynamicConfigurationService.LastClientConfigSync = DateTimeOffset.Now;
-
+                DynamicConfiguration.ClientConfigData =
+                    await Query<ClientConfig>(new Uri(StaticConfiguration.ClientConfigUri));
+                DynamicConfiguration.LastClientConfigSync = DateTimeOffset.Now;
             }
 
-            return DynamicConfigurationService.ClientConfigData;
+            return DynamicConfiguration.ClientConfigData;
         }
 
         ~ConfigurationService()
@@ -68,6 +61,7 @@ namespace GpodderLib.RemoteServices.Configuration
             try
             {
                 _cancellationTokenSource.Cancel();
+                _updateLoop.Wait();
             }
             catch (AggregateException e)
             {
