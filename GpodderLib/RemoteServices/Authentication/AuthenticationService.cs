@@ -40,7 +40,6 @@ namespace GpodderLib.RemoteServices.Authentication
 
             var authRequest = await CreateRequest(authUri);
 
-            authRequest.CookieContainer = DynamicConfiguration.ClientSession;
             authRequest.Method = "POST";
             authRequest.Headers.Add("Authorization", "Basic " + credentials64Str);
 
@@ -65,8 +64,6 @@ namespace GpodderLib.RemoteServices.Authentication
 
             DynamicConfiguration.Username = _userName;
             DynamicConfiguration.Password = _password;
-
-            DynamicConfiguration.ClientSession = new CookieContainer();
 
             if (DynamicConfiguration.SessionId != null)
                 DynamicConfiguration.ClientSession.Add(

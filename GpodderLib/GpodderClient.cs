@@ -54,18 +54,18 @@ namespace GpodderLib
                 AuthenticationService);
         }
 
+        public static async Task<GpodderClient> Init(Stream configurationData, string applicationName, string username,
+                                                     string password)
+        {
+            var client = new GpodderClient(configurationData, applicationName, username, password);
+            await client.Bootstrap();
+            return client;
+        }
+
         public void Dispose()
         {
             DynamicConfiguration.SaveTo(_configurationData).Wait();
             GC.SuppressFinalize(this);
-        }
-
-        public static async Task<GpodderClient> Init(Stream configurationData, string applicationName, string username,
-                                                      string password)
-        {
-            var lib = new GpodderClient(configurationData, applicationName, username, password);
-            await lib.Bootstrap();
-            return lib;
         }
 
         ~GpodderClient()

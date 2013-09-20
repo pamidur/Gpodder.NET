@@ -46,7 +46,6 @@ namespace GpodderLib.RemoteServices
             req.UserAgent = _userAgent;
 #endif
             
-            req.Headers.Add(AppendAdditionalHeader());
             req.CookieContainer = DynamicConfiguration.ClientSession;
 
             if (outgoingContent != null)
@@ -57,11 +56,6 @@ namespace GpodderLib.RemoteServices
             }
 
             return req;
-        }
-
-        protected virtual NameValueCollection AppendAdditionalHeader()
-        {
-            return new WebHeaderCollection();
         }
 
         protected virtual async Task<TR> Query<TR>(Uri uri)

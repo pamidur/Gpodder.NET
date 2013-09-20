@@ -11,6 +11,11 @@ namespace GpodderLib.LocalServices
     [DataContract]
     public class DynamicConfiguration
     {
+        public DynamicConfiguration()
+        {
+            ClientSession = new CookieContainer();
+        }
+
         [DataMember]
         public DateTimeOffset LastServerSync { get; set; }
 
@@ -32,6 +37,7 @@ namespace GpodderLib.LocalServices
         [DataMember]
         public Cookie SessionId { get; set; }
 
+        [IgnoreDataMember]
         public CookieContainer ClientSession { get; set; }
 
         public bool IsLoogedIn
