@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace GpodderLib.RemoteServices.Configuration.Dto
+namespace GpodderLib.Dto
 {
     [DataContract]
     public class GpodderServiceConfig

@@ -1,27 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using GpodderLib.LocalServices;
-using GpodderLib.RemoteServices.Authentication;
-using GpodderLib.RemoteServices.Configuration;
-using GpodderLib.RemoteServices.Suggestions.Dto;
+using GpodderLib.Dto;
+using GpodderLib.Services.Base;
 
-namespace GpodderLib.RemoteServices.Suggestions
+namespace GpodderLib.Services
 {
     public class SuggestionsService : SecuredRemoteServiceBase
     {
         private const string ApiUri = "/suggestions/{count}.json";
 
         public SuggestionsService(
-            StaticConfiguration staticConfiguration, 
-            DynamicConfiguration dynamicConfiguration,
+            Configuration configuration,
             ConfigurationService configurationService,
             AuthenticationService authenticationService)
-            : base(staticConfiguration, dynamicConfiguration, configurationService, authenticationService)
+            : base(configuration, configurationService, authenticationService)
         {
         }
 

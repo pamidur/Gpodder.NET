@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace GpodderLib.RemoteServices.Suggestions.Dto
+namespace GpodderLib.Dto
 {
+    [CollectionDataContract]
+    public class SuggestionSet : List<Suggestion>
+    {
+    }
+
     [DataContract]
-    public class SuggestionItem
+    public class Suggestion
     {
         [DataMember(Name = "website")]
         public Uri Website { get; set; }

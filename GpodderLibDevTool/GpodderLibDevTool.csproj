@@ -39,9 +39,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GpodderLib\GpodderLib.csproj">
-      <Project>{d485c949-df0e-42f7-8148-220df5021d66}</Project>
-      <Name>GpodderLib</Name>
+    <ProjectReference Include="..\Gpodder.Net\Gpodder.Net.csproj">
+      <Project>{a67d83db-233c-4229-9d32-d579eaec3195}</Project>
+      <Name>Gpodder.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

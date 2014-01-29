@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.IsolatedStorage;
-using System.Net;
-using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
-using GpodderLib.LocalServices;
-using GpodderLib.RemoteServices;
-using GpodderLib.RemoteServices.Authentication;
-using GpodderLib.RemoteServices.Configuration;
-using GpodderLib.RemoteServices.Devices;
-using GpodderLib.RemoteServices.Devices.Dto;
-using GpodderLib.RemoteServices.Suggestions;
+using GpodderLib.Services;
 
 namespace GpodderLib
 {
@@ -22,12 +12,12 @@ namespace GpodderLib
         private readonly string _username;
         private readonly string _password;
 
-        public StaticConfiguration StaticConfiguration { get; protected set; }
-        public DynamicConfiguration DynamicConfiguration { get; protected set; }
+        public Configuration Configuration { get; protected set; }
         public ConfigurationService ConfigurationService { get; protected set; }
         public AuthenticationService AuthenticationService { get; protected set; }
         public SuggestionsService SuggestionsService { get; protected set; }
         public DevicesService DevicesService { get; protected set; }
+        public DirectoryService DirectoryService { get; protected set; }
 
         private GpodderClient(Stream configurationData, string applicationName, string username, string password)
         {
@@ -39,19 +29,13 @@ namespace GpodderLib
 
         private async Task Bootstrap()
         {
-            StaticConfiguration = new StaticConfiguration();
-            DynamicConfiguration = await DynamicConfiguration.LoadFrom(_configurationData);
+            Configuration = await Configuration.LoadFrom(_configurationData);
 
-            ConfigurationService = new ConfigurationService(StaticConfiguration, DynamicConfiguration);
-
-            AuthenticationService = new AuthenticationService(StaticConfiguration, DynamicConfiguration,
-                ConfigurationService, _username, _password);
-
-            SuggestionsService = new SuggestionsService(StaticConfiguration, DynamicConfiguration, ConfigurationService,
-                AuthenticationService);
-
-            DevicesService = new DevicesService(StaticConfiguration, DynamicConfiguration, ConfigurationService,
-                AuthenticationService);
+            ConfigurationService = new ConfigurationService(Configuration);
+            AuthenticationService = new AuthenticationService(Configuration,ConfigurationService, _username, _password);
+            SuggestionsService = new SuggestionsService(Configuration, ConfigurationService,AuthenticationService);
+            DevicesService = new DevicesService(Configuration, ConfigurationService,AuthenticationService);
+            DirectoryService = new DirectoryService(Configuration, ConfigurationService);
         }
 
         public static async Task<GpodderClient> Init(Stream configurationData, string applicationName, string username,
@@ -64,7 +48,7 @@ namespace GpodderLib
 
         public void Dispose()
         {
-            DynamicConfiguration.SaveTo(_configurationData).Wait();
+            Configuration.SaveTo(_configurationData).Wait();
             GC.SuppressFinalize(this);
         }
 

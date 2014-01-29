@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GpodderLib.LocalServices;
-using GpodderLib.RemoteServices.Configuration.Dto;
+using GpodderLib.Dto;
+using GpodderLib.Services.Base;
 
-namespace GpodderLib.RemoteServices.Configuration
+namespace GpodderLib.Services
 {
     public class ConfigurationService : RemoteServiceBase
     {
+        private static readonly string _clientConfigUri = "https://gpodder.net/clientconfig.json";
+
         private Task<ClientConfig> _getConfigTask;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly Task _updateLoop;
 
 
-        public ConfigurationService(StaticConfiguration staticConfiguration, DynamicConfiguration dynamicConfiguration) : base(staticConfiguration, dynamicConfiguration)
+        public ConfigurationService(Configuration configuration) : base(configuration)
         {
             _updateLoop = UpdateConfigLoop(_cancellationTokenSource.Token);
         }
@@ -28,12 +30,12 @@ namespace GpodderLib.RemoteServices.Configuration
             _getConfigTask = QueryClientConfig(cancellationToken);
             await _getConfigTask;
             
-            var msToWaitBeforeUpdate = DynamicConfiguration.ClientConfigData == null
+            var msToWaitBeforeUpdate = Configuration.ClientConfigData == null
                                            ? 0
                                            : Convert.ToInt32(
-                                               (DynamicConfiguration.ClientConfigData.UpdateTimeout -
+                                               (Configuration.ClientConfigData.UpdateTimeout -
                                                 (DateTimeOffset.UtcNow -
-                                                 DynamicConfiguration.LastClientConfigSync)
+                                                 Configuration.LastClientConfigSync)
                                                     .TotalSeconds))*1000;
 
             await Task.Delay(msToWaitBeforeUpdate, cancellationToken);
@@ -44,16 +46,16 @@ namespace GpodderLib.RemoteServices.Configuration
 
         private async Task<ClientConfig> QueryClientConfig(CancellationToken cancellationToken)
         {
-            if (DynamicConfiguration.ClientConfigData == null ||
-                DynamicConfiguration.LastClientConfigSync.AddSeconds(
-                    DynamicConfiguration.ClientConfigData.UpdateTimeout) < DateTimeOffset.UtcNow)
+            if (Configuration.ClientConfigData == null ||
+                Configuration.LastClientConfigSync.AddSeconds(
+                    Configuration.ClientConfigData.UpdateTimeout) < DateTimeOffset.UtcNow)
             {
-                DynamicConfiguration.ClientConfigData =
-                    await Query<ClientConfig>(new Uri(StaticConfiguration.ClientConfigUri));
-                DynamicConfiguration.LastClientConfigSync = DateTimeOffset.Now;
+                Configuration.ClientConfigData =
+                    await Query<ClientConfig>(new Uri(_clientConfigUri));
+                Configuration.LastClientConfigSync = DateTimeOffset.Now;
             }
 
-            return DynamicConfiguration.ClientConfigData;
+            return Configuration.ClientConfigData;
         }
 
         ~ConfigurationService()

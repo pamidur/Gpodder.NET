@@ -3,22 +3,42 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GpodderLibDevTool", "GpodderLibDevTool\GpodderLibDevTool.csproj", "{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GpodderLib", "GpodderLib\GpodderLib.csproj", "{D485C949-DF0E-42F7-8148-220DF5021D66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gpodder.Net", "Gpodder.Net\Gpodder.Net.csproj", "{A67D83DB-233C-4229-9D32-D579EAEC3195}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|AnyCPU = Debug|AnyCPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Release|Any CPU = Release|Any CPU
 		Release|AnyCPU = Release|AnyCPU
+		Release|Mixed Platforms = Release|Mixed Platforms
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
 		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Release|AnyCPU.ActiveCfg = Debug|Any CPU
 		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Release|AnyCPU.Build.0 = Debug|Any CPU
-		{D485C949-DF0E-42F7-8148-220DF5021D66}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
-		{D485C949-DF0E-42F7-8148-220DF5021D66}.Debug|AnyCPU.Build.0 = Debug|Any CPU
-		{D485C949-DF0E-42F7-8148-220DF5021D66}.Release|AnyCPU.ActiveCfg = Release|Any CPU
-		{D485C949-DF0E-42F7-8148-220DF5021D66}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C9E1A2B8-73EF-4E51-B2B9-1A8624B6D58B}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A67D83DB-233C-4229-9D32-D579EAEC3195}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

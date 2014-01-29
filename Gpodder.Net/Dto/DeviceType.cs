@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace GpodderLib.RemoteServices.Devices.Dto
+namespace GpodderLib.Dto
 {
     [DataContract]
     public enum DeviceType
